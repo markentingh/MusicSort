@@ -9,6 +9,24 @@ namespace MusicSort
 {
     public partial class Sorter : Form
     {
+        private string[] extensions = new string[] { ".mp3", ".flac" };
+        private List<string> CDs = new string[] { "cd1", "cd2", "cd3", "cd4", "cd 1", "cd 2", "cd 3", "cd 4", "disc1", "disc2", "disc3", "disc4", "disc 1", "disc 2", "disc 3", "disc 4",
+                                "cd01", "cd02", "cd03", "cd04", "cd 01", "cd 02", "cd 03", "cd 04", "disc01", "disc02", "disc03", "disc04", "disc 01", "disc 02", "disc 03", "disc 04"}.ToList();
+        private string[] CDreplace = new string[] { "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4",
+                                "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4", "cd 1", "cd 2", "cd 3", "cd 4"};
+        private string[] commonFolders = new string[] { "albums", "compilations", "remixes", "singles", "tracks", "demos", "doodles", "wip", "work in progress", "originals", "remakes", "eps", "downloads", "bonus disc", "bonus track", "discs", "cds" };
+        private string[] subFolders = new string[] { "albums", "compilations", "remixes", "singles", "tracks", "demos", "doodles", "wip", "work in progress", "originals", "remakes", "eps", "downloads" };
+        private string[] commonFoldersAsExtra = new string[] { "bonus" };
+        private List<string> years = new string[] { "[1", "[2", "(1", "(2" }.ToList();
+        private string[] yearsEnd = new string[] { "]", "]", ")", ")" };
+        private string[] nums = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+        private string[] trackNumEnd = new string[] { ".", "-", ")", "]" };
+        private string[] replaceBadStart = new string[] { ".", "-", ")", "]", "}" };
+        private string[] replaceBadEnd = new string[] { ".", "-", "(", "[", "{" };
+        private string[] replaceBadStr = new string[] { "[]", "()", "{}", "[ ]", "( )", "{ }", "flac", "mp3" };
+        private string[] subStart = new string[] { "(", "[", "{" };
+        private string[] subEnd = new string[] { ")", "]", "}" };
+
         public Sorter()
         {
             InitializeComponent();
@@ -31,17 +49,8 @@ namespace MusicSort
             btnSearch.Visible = false;
             Refresh();
 
-            var extensions = new string[] { ".mp3", ".flac" };
             var files = GetFiles(txtFolder.Text, extensions.ToList());
             string[] p;
-            var CDs = new string[] { "cd1", "cd2", "cd3", "cd4", "cd 1", "cd 2", "cd 3", "cd 4", "disc1", "disc2", "disc3", "disc4", "disc 1", "disc 2", "disc 3", "disc 4",
-                                    "cd01", "cd02", "cd03", "cd04", "cd 01", "cd 02", "cd 03", "cd 04", "disc01", "disc02", "disc03", "disc04", "disc 01", "disc 02", "disc 03", "disc 04"};
-            var commonFolders = new string[] { "albums", "compilations", "remixes", "singles", "tracks", "demos", "doodles", "wip", "work in progress", "originals", "remakes", "downloads" };
-            var years = new string[] { "[1", "[2", "(1", "(2" }.ToList();
-            var yearsEnd = new string[] { "]", "]", ")", ")" };
-            var nums = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
-            var trackNumEnd = new string[] { ".", "-", ")", "]" };
-            var trackNameStart = new string[] { ".", "-", "_", ")", "]", "}" };
             var x = 0;
             var i = 0;
             var a = 0;
@@ -49,9 +58,13 @@ namespace MusicSort
             var skip = 0;
             var inc = 0;
             var num = 0.0;
+            var pathlen = txtFolder.Text.Split('\\').Length;
             var tempTrackNums = new int[] { 0, 0, 0 };
             var str = new string[] { };
             var orig = "";
+            var yr = "";
+            var dotspace = "";
+            var clean = "";
             FileDetails file;
             FileDetails lastFile;
             var details = new List<FileDetails>();
@@ -63,6 +76,10 @@ namespace MusicSort
                 p = f.ToLower().Replace("_", " ").Split('\\');
                 x = p.Length;
                 file = new FileDetails();
+                file.extra = "";
+                file.CD = "";
+                file.year = "";
+                file.subfolder = "";
                 skip = 0;
                 inc = 0;
                 
@@ -71,41 +88,48 @@ namespace MusicSort
                 while(skip < 3)
                 {
                     a = x - 2 - skip;
-                    if (p[a].Length <= 8 && CDs.Count(c => p[a].IndexOf(c) >= 0) > 0)
+                    dotspace = p[a].Replace(".", " ");
+                    clean = dotspace.Replace("(", "").Replace("[", "").Replace(")", "").Replace("]","");
+                    if (CDs.Count(c => dotspace.IndexOf(c) >= 0 && dotspace.IndexOf(c) <= 2) > 0)
                     {
                         //found folder for CD
-                        file.CD = CDs.Where(c => p[a].IndexOf(c) >= 0).ToList()[0].Replace(" ", "").ToUpper().Trim();
+                        file.CD = CDreplace[CDs.FindIndex(c => dotspace.IndexOf(c) >= 0)].ToUpper().Replace(" ","").Replace("DISC","CD").Trim();
                     }
-                    else if (commonFolders.Count(c => p[a].IndexOf(c) == 0) > 0)
+                    else if (commonFolders.Count(c => clean.IndexOf(c) == 0) > 0)
                     {
                         //found a common folder
-                    }
-                    else {
-                        //this must be an album folder
-                        file.album = p[a].Trim();
-                        i = years.FindIndex(0, 1, c => file.album.IndexOf(c) >= 0);
-                        if (i >= 0)
+                        if(commonFoldersAsExtra.Count(c => clean.IndexOf(c) == 0) > 0)
                         {
-                            //year exists in folder
-                            y[0] = file.album.IndexOf(years[i], 0);
-                            y[1] = file.album.IndexOf(yearsEnd[i], y[0] + 1);
-                            if (y[1] > 0)
+                            file.extra = clean.Trim();
+                        }
+                        if (subFolders.Count(c => clean.IndexOf(c) == 0) > 0)
+                        {
+                            file.subfolder = clean.Trim();
+                        }
+                    }
+                    else
+                    {
+                        //check if album is already found
+                        if(file.album.Length == 0 && a > pathlen) {
+                            //this must be an album folder
+                            file.album = p[a].Trim();
+
+                            //get year if it exists
+                            yr = GetYear(file.album);
+                            if (yr.Length > 0)
                             {
-                                //found full year
-                                file.year = file.album.Substring(y[0] + 1, y[1] - (y[0] + 1)).Trim();
-                                file.album = file.album.Replace(file.album.Substring(y[0], (y[1] + 1) - y[0]), "").Replace("  ", " ").Trim();
+                                file.year = yr;
+                                file.album = RemoveBadStrings(file.album.Replace(yr, ""));
                             }
                         }
-                        break;
                     }
                     skip++;
                 }
-                
 
                 //get artist folder ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                while (skip < 6)
+                a = pathlen;
+                while (a < p.Length - 1)
                 {
-                    a = x - 3 - skip;
                     if (commonFolders.Count(c => p[a].IndexOf(c) == 0) == 0)
                     {
                         //found artist folder
@@ -124,23 +148,50 @@ namespace MusicSort
                                 if(file.album.IndexOf(file.artist) == 0)
                                 {
                                     file.album = p[a + 2];
+
+                                    //get year if it exists
+                                    yr = GetYear(file.album);
+                                    if (yr.Length > 0)
+                                    {
+                                        file.year = yr;
+                                        file.album = RemoveBadStrings(file.album.Replace(yr, ""));
+                                    }
                                 }
                             }
                         }
                         else
                         {
                             file.artist = p[a];
+
+                            //get year if it exists
+                            yr = GetYear(file.artist);
+                            if (yr.Length > 0 && file.year == "")
+                            {
+                                file.year = yr;
+                                file.artist = RemoveBadStrings(file.artist.Replace(yr, ""));
+                            }
                         }
                         
                         break;
                     }
-                    skip++;
+                    a++;
                 }
+                file.artist = RemoveSubContent(file.artist);
+
+                if(file.album.IndexOf(file.artist) == 0 && file.album.Length > file.artist.Length)
+                {
+                    //remove artist name from album
+                    file.album = file.album.Substring(file.artist.Length);
+                }
+                file.album = RemoveBadStrings(file.album);
 
                 //get track name /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 file.filename = p[x - 1].Trim();
                 file.folder = f.ToLower().Replace(file.filename, "");
                 file.trackName = file.filename.Replace("_", " ");
+                str = file.filename.Split('.');
+                file.extension = str[str.Length - 1];
+
                 //remove file extension from track name
                 foreach (var ext in extensions)
                 {
@@ -191,7 +242,7 @@ namespace MusicSort
                                 a = i;
                                 y[0] = i;
                                 tempTrackNums[2] = i; //temp end index for 1st number set
-                                skip = 1;
+                                skip++;
                             }
                         }
                         a++;
@@ -206,12 +257,16 @@ namespace MusicSort
                     {
                         file.trackName = file.trackName.Trim();
                     }
-                    
-                    //remove lingering character symbols at the beginning of the track name
-                    if (trackNameStart.Count(c => file.trackName.IndexOf(c) == 0) == 1)
+
+                    //get year if it exists
+                    yr = GetYear(file.trackName);
+                    if (yr.Length > 0 && file.year == "")
                     {
-                        file.trackName = file.trackName.Substring(1).Trim();
+                        file.year = yr;
+                        file.trackName = RemoveBadStrings(file.trackName.Replace(yr, ""));
                     }
+
+                    file.trackName = RemoveBadStrings(file.trackName);
 
                     //remove extra content from track name
                     if (file.trackName.IndexOf(" - ") > 0)
@@ -219,29 +274,40 @@ namespace MusicSort
                         str = file.trackName.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
                         if (str[0].IndexOf(file.artist) >= 0 || str[0].IndexOf(file.album) >= 0)
                         {
-                            file.trackName = str[str.Length - 1];
+                            file.trackName = string.Join(" - ", str.Skip(1).ToArray());
                         }
                     }
-                    if (file.trackName.IndexOf(file.artist) == 0 && file.artist.Length > 0)
+                    //remove artist from trackname
+                    if ((file.trackName.IndexOf(file.artist) == 0 || file.trackName.IndexOf(file.artist) == 1) && 
+                        file.artist.Length > 0 && file.trackName.IndexOf("feat") < 0 && file.trackName.IndexOf("vs") < 0)
                     {
                         file.trackName = file.trackName.Split(new string[] { file.artist }, 2, StringSplitOptions.None)[1];
                     }
-                    //remove lingering character symbols at the beginning of the track name
-                    if (trackNameStart.Count(c => file.trackName.IndexOf(c) == 0) == 1)
+                    file.trackName = RemoveBadStrings(file.trackName);
+
+                    //track name is empty, use original track name
+                    if (file.trackName == "" && file.trackNumber > 0)
                     {
-                        file.trackName = file.trackName.Substring(1).Trim();
-                    }
-                    if(file.trackName == "" && file.trackNumber > 0)
-                    {
-                        file.trackName = orig;
+                        file.trackName = RemoveBadStrings(orig);
                         file.trackNumber = 0;
+                    }else if(file.trackName == "")
+                    {
+                        file.trackName = RemoveBadStrings(orig);
                     }
-                    if (double.TryParse(file.trackName.Substring(0, 1), out num) == false) { break; }
-                        inc++;
+
+                    //if there is no number at the beginning of the track, then exit loop
+                    if (double.TryParse(file.trackName.Substring(0, 1), out num) == false) {
+                        break;
+                    }
+                    else
+                    {
+                        if (trackNumEnd.Count(c => file.trackName.IndexOf(c) > 0 && file.trackName.IndexOf(c) < 4) == 0)
+                        {
+                            break;
+                        }
+                    }
+                    inc++;
                 }
-                
-
-
 
                 //check previous file for similar values
                 if (details.Count > 0)
@@ -263,8 +329,21 @@ namespace MusicSort
                             lastFile.CD = "";
                             details[details.Count - 1] = lastFile;
                         }
+                        else if(lastFile.CD != "" && file.CD != "")
+                        {
+                            //check for large skip in CD #
+                            if(int.Parse(file.CD.Replace("CD","")) - int.Parse(lastFile.CD.Replace("CD", "")) > 1)
+                            {
+                                file.CD = lastFile.CD;
+                            }
+                        }
                     }
                 }
+
+                //build restructured file path
+                file.renamed = GetCapitalized(file.artist + "\\" + (file.subfolder.Length > 0 ? file.subfolder + "\\" : "") +  // artist/sub-folder/
+                                (file.album.Length > 0 ? (file.year != "" ? "(" + file.year + ") " : "") + file.album + (file.extra.Length > 0 ? " (" + file.extra + ")" : "") + "\\": "") + // (year) album (extra)
+                                (file.trackNumber > 0 ? file.trackNumber.ToString("00") + " - " : "") + file.trackName) + "." + file.extension; // # track name.ext
                 
                 //finally, add file to list
                 details.Add(file);
@@ -273,12 +352,14 @@ namespace MusicSort
                 progress.Refresh();
             }
 
+            dataFiles.AutoGenerateColumns = false;
             dataFiles.DataSource = details;
 
             progress.Visible = false;
             txtFolder.Visible = true;
             btnBrowse.Visible = true;
             btnSearch.Visible = true;
+            panelMove.Visible = true;
         }
 
         private List<string> GetFiles(string folder, List<string> extensions)
@@ -302,6 +383,139 @@ namespace MusicSort
 
             return files;
         }
+
+        private string GetYear(string str)
+        {
+            var i = -1;
+            var o = 0;
+            var s = "";
+            var result = "";
+            for(var x = 0; x < str.Length; x++)
+            {
+                s = str.Substring(x, 1);
+                if (int.TryParse(s, out o) == true)
+                {
+                    if(i == -1)
+                    {
+                        //found beginning of number
+                        i = x;
+                    }
+                }
+                else
+                {
+                    if(i >= 0)
+                    {
+                        //found end of number
+                        o = int.Parse(str.Substring(i, x - i));
+                        if(o < 1900 || o > DateTime.Now.Year + 1)
+                        {
+                            //not a believable date, keep searching
+                            i = -1;
+                        }
+                        else
+                        {
+                            //found year, exit
+                            result = o.ToString();
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        private string GetCapitalized(string str)
+        {
+            var s = "";
+            var trig = true;
+            char[] symbols = (" !@#$%^&*()[]{}\\|;:\",.<>/?~`-+=").ToCharArray();
+
+            foreach (var c in str)
+            {
+                if(trig == true)
+                {
+                    if (!symbols.Contains(c))
+                    {
+                        //capitalize
+                        s += c.ToString().ToUpper();
+                    }
+                    else
+                    {
+                        s += c.ToString();
+                    }
+                }
+                else
+                {
+                    s += c.ToString();
+                }
+                trig = symbols.Contains(c);
+            }
+            return s;
+        }
+
+        private string RemoveBadStrings(string str)
+        {
+            var s = str;
+            if (str.Length > 0)
+            {
+                foreach (var r in replaceBadStr)
+                {
+                    s = s.Replace(r, "");
+                }
+                s = s.Trim();
+                if(s.Length > 0)
+                {
+                    //no brackets allowed
+                    s = s.Replace("[", " (").Replace("]", ") ");
+
+                    if (replaceBadStart.Count(c => s.IndexOf(c) == 0) >= 1)
+                    {
+                        s = s.Substring(1).Trim();
+                    }
+                }
+                if (s.Length > 0)
+                {
+                    if (replaceBadEnd.Count(c => s.IndexOf(c) == s.Length - 1) >= 1)
+                    {
+                        s = s.Substring(0, s.Length - 2).Trim();
+                    }
+                }
+            }
+            if(s.Length > 0)
+            {
+                //replace double spaces
+                s = s.Replace("  ", " ").Replace("  ", " ");
+            }
+            
+            return s;
+        }
+
+        private string RemoveSubContent(string str)
+        {
+            var s = str.Trim();
+            var i = 0;
+            var e = 0;
+            var changed = false;
+            do
+            {
+                changed = false;
+                for (var x = 0; x < subStart.Length; x++)
+                {
+                    i = s.IndexOf(subStart[x]);
+                    if (i >= 0)
+                    {
+                        e = s.IndexOf(subEnd[x]);
+                        if (e > 0)
+                        {
+                            s = s.Remove(i, e - i + 1);
+                            changed = true;
+                        }
+                    }
+                }
+            } while (changed == true);
+
+            return s;
+        }
     }
 
     public class FileDetails
@@ -315,6 +529,9 @@ namespace MusicSort
         public string trackName { get; set; }
         public string year { get; set; }
         public string renamed { get; set; } //AI creates this name
+        public string extension { get; set; }
+        public string extra { get; set; }
+        public string subfolder { get; set; }
 
         public FileDetails(string folder = "", string filename = "", string artist = "", string album = "", string CD = "", int trackNumber = 0, string trackName = "", string year = "")
         {

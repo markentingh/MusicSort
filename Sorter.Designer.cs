@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.txtFolder = new System.Windows.Forms.TextBox();
             this.btnSearch = new System.Windows.Forms.Button();
@@ -37,6 +37,12 @@
             this.dataFiles = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.progress = new System.Windows.Forms.ProgressBar();
+            this.panelMove = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btnMove = new System.Windows.Forms.Button();
+            this.txtMove = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.Folder = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Filename = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Artist = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -47,6 +53,7 @@
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Renamed = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataFiles)).BeginInit();
+            this.panelMove.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtFolder
@@ -127,14 +134,14 @@
             this.Column2,
             this.Column3,
             this.Renamed});
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.LightCyan;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataFiles.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.LightCyan;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataFiles.DefaultCellStyle = dataGridViewCellStyle3;
             this.dataFiles.Location = new System.Drawing.Point(13, 103);
             this.dataFiles.MultiSelect = false;
             this.dataFiles.Name = "dataFiles";
@@ -159,11 +166,89 @@
             // 
             // progress
             // 
+            this.progress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.progress.Location = new System.Drawing.Point(12, 41);
             this.progress.Name = "progress";
             this.progress.Size = new System.Drawing.Size(1350, 29);
             this.progress.TabIndex = 6;
             this.progress.Visible = false;
+            // 
+            // panelMove
+            // 
+            this.panelMove.Controls.Add(this.label5);
+            this.panelMove.Controls.Add(this.label4);
+            this.panelMove.Controls.Add(this.label3);
+            this.panelMove.Controls.Add(this.btnMove);
+            this.panelMove.Controls.Add(this.txtMove);
+            this.panelMove.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelMove.Location = new System.Drawing.Point(0, 0);
+            this.panelMove.Name = "panelMove";
+            this.panelMove.Size = new System.Drawing.Size(1377, 92);
+            this.panelMove.TabIndex = 7;
+            this.panelMove.Visible = false;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(13, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(429, 20);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Select a Folder to Move Your Restructured Music Library to.";
+            // 
+            // btnMove
+            // 
+            this.btnMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMove.BackColor = System.Drawing.Color.DarkOrchid;
+            this.btnMove.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMove.FlatAppearance.BorderColor = System.Drawing.Color.Indigo;
+            this.btnMove.FlatAppearance.BorderSize = 2;
+            this.btnMove.FlatAppearance.MouseDownBackColor = System.Drawing.Color.MediumOrchid;
+            this.btnMove.FlatAppearance.MouseOverBackColor = System.Drawing.Color.MediumPurple;
+            this.btnMove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMove.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMove.ForeColor = System.Drawing.Color.White;
+            this.btnMove.Location = new System.Drawing.Point(1243, 38);
+            this.btnMove.Name = "btnMove";
+            this.btnMove.Size = new System.Drawing.Size(119, 33);
+            this.btnMove.TabIndex = 4;
+            this.btnMove.Text = "Move Files";
+            this.btnMove.UseVisualStyleBackColor = false;
+            // 
+            // txtMove
+            // 
+            this.txtMove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtMove.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtMove.Location = new System.Drawing.Point(13, 42);
+            this.txtMove.Name = "txtMove";
+            this.txtMove.Size = new System.Drawing.Size(1213, 26);
+            this.txtMove.TabIndex = 3;
+            this.txtMove.Text = "D:\\Music";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.ForeColor = System.Drawing.Color.OrangeRed;
+            this.label4.Location = new System.Drawing.Point(76, 75);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(313, 17);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Root-Folder\\Artist\\(year) Album\\Disc 1\\Track.flac";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.ForeColor = System.Drawing.Color.DimGray;
+            this.label5.Location = new System.Drawing.Point(14, 75);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(65, 17);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Example:";
             // 
             // Folder
             // 
@@ -231,7 +316,7 @@
             // Renamed
             // 
             this.Renamed.DataPropertyName = "renamed";
-            this.Renamed.HeaderText = "Renamed";
+            this.Renamed.HeaderText = "Restructured";
             this.Renamed.Name = "Renamed";
             this.Renamed.ReadOnly = true;
             this.Renamed.Width = 500;
@@ -241,6 +326,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1377, 779);
+            this.Controls.Add(this.panelMove);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dataFiles);
             this.Controls.Add(this.btnBrowse);
@@ -251,6 +337,8 @@
             this.Name = "Sorter";
             this.Text = "MusicSort";
             ((System.ComponentModel.ISupportInitialize)(this.dataFiles)).EndInit();
+            this.panelMove.ResumeLayout(false);
+            this.panelMove.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -266,6 +354,12 @@
         private System.Windows.Forms.DataGridView dataFiles;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ProgressBar progress;
+        private System.Windows.Forms.Panel panelMove;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btnMove;
+        private System.Windows.Forms.TextBox txtMove;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.DataGridViewTextBoxColumn Folder;
         private System.Windows.Forms.DataGridViewTextBoxColumn Filename;
         private System.Windows.Forms.DataGridViewTextBoxColumn Artist;
